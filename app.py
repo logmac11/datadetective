@@ -31,7 +31,7 @@ if 'quiz_started' not in st.session_state:
     st.session_state.submitted = False
 
 # --- UI: HEADER ---
-st.title("📊 IT Data Analytics Assessment")
+st.title("📊 Data Detective:Case Closed")
 
 # --- STEP 1: REGISTRATION ---
 if not st.session_state.quiz_started:
@@ -119,4 +119,5 @@ else:
         for key in st.session_state.keys():
             del st.session_state[key]
         st.rerun()
+
 
