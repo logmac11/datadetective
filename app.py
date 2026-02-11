@@ -4,7 +4,7 @@ import pandas as pd
 import datetime
 
 # --- CONFIGURATION ---
-st.set_page_config(page_title="Data Detective:Case Closed", page_icon="📊")
+st.set_page_config(page_title="Data Detective: Case Closed", page_icon="📊")
 
 # Your Spreadsheet URL
 spreadsheet_url = "https://docs.google.com/spreadsheets/d/11tpVhGAqNGGH0XraZg1URZJvWEh8SPmiWfoJOmTw__8/edit?usp=sharing"
@@ -31,7 +31,7 @@ if 'quiz_started' not in st.session_state:
     st.session_state.submitted = False
 
 # --- UI: HEADER ---
-st.title("📊 Data Detective:Case Closed")
+st.title("📊 Data Detective: Case Closed")
 
 # --- STEP 1: REGISTRATION ---
 if not st.session_state.quiz_started:
@@ -81,7 +81,6 @@ else:
     total = len(questions)
     percentage = (score / total) * 100
 
-    # Display Results to Student
     st.header("✨ Quiz Results")
     col1, col2 = st.columns(2)
     col1.metric("Correct Answers", f"{score} / {total}")
@@ -94,30 +93,4 @@ else:
     else:
         st.error("Keep practicing. Focus on how data is refined like gold.")
 
-    # Save to Google Sheets
-    with st.spinner("Saving your results to the database..."):
-        try:
-            conn = st.connection("gsheets", type=GSheetsConnection)
-            new_row = pd.DataFrame([{
-                "Name": st.session_state.name,
-                "Phone": st.session_state.phone,
-                "Email": st.session_state.email,
-                "Score": score,
-                "Total": total,
-                "Percentage": f"{percentage}%",
-                "Time Submitted": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            }])
-            
-            existing_data = conn.read(spreadsheet=spreadsheet_url, worksheet="Results")
-            updated_data = pd.concat([existing_data, new_row], ignore_index=True)
-            conn.update(spreadsheet=spreadsheet_url, worksheet="Results", data=updated_data)
-            st.info("✅ Result saved to Google Sheets.")
-        except Exception as e:
-            st.error(f"Error saving data: {e}")
-
-    if st.button("Restart Quiz"):
-        for key in st.session_state.keys():
-            del st.session_state[key]
-        st.rerun()
-
-
+    # Save to Google
