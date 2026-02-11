@@ -94,3 +94,41 @@ else:
         st.error("Keep practicing. Focus on how data is refined like gold.")
 
     # Save to Google
+# Save to Google Sheets
+    with st.spinner("Saving your results..."):
+        try:
+            conn = st.connection("gsheets", type=GSheetsConnection)
+            
+            # 1. Prepare the new row
+            new_row_data = {
+                "Name": st.session_state.name,
+                "Phone": st.session_state.phone,
+                "Email": st.session_state.email,
+                "Score": score,
+                "Total": total,
+                "Percentage": f"{int(percentage)}%",
+                "Time Submitted": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            new_df = pd.DataFrame([new_row_data])
+            
+            # 2. Force Read and Append
+            # We use a try-except here to handle cases where the sheet is totally blank
+            try:
+                existing_data = conn.read(spreadsheet=spreadsheet_url, worksheet="Results", ttl=0)
+                updated_data = pd.concat([existing_data, new_df], ignore_index=True)
+            except:
+                # If reading fails (empty sheet), just use the new row
+                updated_data = new_df
+            
+            # 3. Push back to Google
+            conn.update(spreadsheet=spreadsheet_url, worksheet="Results", data=updated_data)
+            st.info("✅ Result saved to Google Sheets!")
+            
+        except Exception as e:
+            st.error(f"Save failed. Error details: {e}")
+
+    if st.button("Restart Quiz"):
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.rerun()
+
